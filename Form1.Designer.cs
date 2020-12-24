@@ -91,7 +91,7 @@ namespace Лабораторная_работа__6
             // 
             // lineButton
             // 
-            this.lineButton.BackColor = System.Drawing.Color.AliceBlue;
+            this.lineButton.BackColor = System.Drawing.Color.White;
             this.lineButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.lineButton.Font = new System.Drawing.Font("Segoe UI Symbol", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lineButton.ForeColor = System.Drawing.Color.CornflowerBlue;
@@ -139,7 +139,6 @@ namespace Лабораторная_работа__6
             this.pictureBox.Size = new System.Drawing.Size(618, 435);
             this.pictureBox.TabIndex = 1;
             this.pictureBox.TabStop = false;
-            this.pictureBox.Paint += new System.Windows.Forms.PaintEventHandler(this.pictureBox_Paint);
             this.pictureBox.MouseDown += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseDown);
             this.pictureBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseMove);
             this.pictureBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseUp);

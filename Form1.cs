@@ -24,19 +24,36 @@ namespace Лабораторная_работа__6
 
         private void pictureBox_MouseDown(object sender, MouseEventArgs e)
         {
-            model.mouseIsPressed = true;
-            model.doTheRightThing(e.X, e.Y);
+
+            if (e.Button == MouseButtons.Left)
+            {
+                model.mouseIsPressed = true;
+                model.doTheRightThing(e.X, e.Y);
+                pictureBox.Image = model.image;
+            }
         }
 
         private void pictureBox_MouseMove(object sender, MouseEventArgs e)
         {
-            model.doTheRightThing(e.X, e.Y);
+            if (e.Button == MouseButtons.Left)
+                if (model.creatingObject)
+                {
+                    model.drawOnline(e.X, e.Y);
+                    pictureBox.Image = model.image;
+                }
+
         }
 
         private void pictureBox_MouseUp(object sender, MouseEventArgs e)
         {
-            model.mouseIsPressed = false;
-            model.doTheRightThing(e.X, e.Y);
+            if (e.Button == MouseButtons.Left)
+                if (model.creatingObject == true)
+                {
+                    model.mouseIsPressed = false;
+                    model.creatingObject = false;
+                    model.add();
+                    pictureBox.Image = model.image;
+                }
         }
 
         private void lineButton_Click(object sender, EventArgs e)
@@ -63,19 +80,14 @@ namespace Лабораторная_работа__6
             }
         }
 
-        private void pictureBox_Paint(object sender, PaintEventArgs e)
-        {
-            //pictureBox.Image = model.image;
-        }
-
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
         {
             switch(e.KeyCode)
             {
-                case Keys.Control:
+                case Keys.ControlKey:
                     model.ctrlIsPressed = true;
                     break;
-                case Keys.Alt:
+                case Keys.ShiftKey:
                     model.altIsPressed = true;
                     break;
                 case Keys.W:
@@ -94,18 +106,23 @@ namespace Лабораторная_работа__6
                     model.dIsPressed = true;
                     model.move();
                     break;
+                case Keys.Delete:
+                    model.delete();
+                    break;
             }
+            pictureBox.Image = model.image;
         }
 
         private void MainForm_KeyUp(object sender, KeyEventArgs e)
         {
             switch (e.KeyCode)
             {
-                case Keys.Control:
+                case Keys.ControlKey:
                     model.ctrlIsPressed = false;
                     break;
-                case Keys.Alt:
+                case Keys.ShiftKey:
                     model.altIsPressed = false;
+                    model.correct();
                     break;
                 case Keys.W:
                     model.wIsPressed = false;
@@ -120,6 +137,7 @@ namespace Лабораторная_работа__6
                     model.dIsPressed = false;
                     break;
             }
+            model.velocity = 5;
         }
     }
 }

@@ -126,9 +126,9 @@ namespace Лабораторная_работа__6
 			return last.obj;
 		}
 
-		public T getCurrent() // Возвращает текущий объект
+		public ref T getCurrent() // Возвращает текущий объект
 		{
-			return current.obj;
+			return ref current.obj;
 		}
 
 		public void setFirst() // Устанавливает current на начало списка
@@ -143,6 +143,8 @@ namespace Лабораторная_работа__6
 
 		public bool eol() // End Of List
 		{
+			if (current == null)
+				return true;
 			if (current.next == null)
 				return true;
 			else
