@@ -1,66 +1,76 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Drawing;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Лабораторная_работа__6
 {
     public class Model
     {
-        public Graphics g;
-        public Bitmap image;
-        private Painter painter;
-        private Storage<GraphicObject> storage;
-        private Storage<GraphicObject> selectedStorage;
-        private Storage<Color> originColorStorage;
-        private int creationMode;
-        private Color color = Color.Black;
+        public Graphics g; // Предоставляет методы для рисования
+        public Bitmap image; // Изображение, на котором происходят изменения
+        private Painter painter; // Класс, который знает, как должны выглядеть объекты
+        private Color color = Color.Black; // Цвет новых объектов
+        private Color selectedColor = Color.Red; // Цвет выделенных объектов
+
+        private Storage<GraphicObject> storage; // Хранилище всех объектов
+        private Storage<GraphicObject> selectedStorage; // Хранилище выделенных объектов
+        public GraphicObject temp; // Временный объект, находящийся в процессе создания
+
+        private int creationMode; // Тип создаваемой фигуры (Line = 0, Rectangle = 1, Ellipse = 2)
+        public int velocity = 5; // Скорость изменения, передвижения. Поделить на 5
+        public bool creatingObject; // ЛКМ нажата и не отпущена - режим создания объекта
+
         public bool ctrlIsPressed;
-        public bool altIsPressed;
+        public bool shiftIsPressed;
         public bool wIsPressed;
         public bool aIsPressed;
         public bool sIsPressed;
         public bool dIsPressed;
-        public bool mouseIsPressed;
-        public bool creatingObject;
-        public int velocity;
+        
+        public delegate void Refresh();
+        public Refresh refresh; // Функция обновления картинки в интерфейсе
 
         public Model()
         {
             storage = new Storage<GraphicObject>();
             selectedStorage = new Storage<GraphicObject>();
-            originColorStorage = new Storage<Color>();
             
             image = new Bitmap(1920, 1080);
             g = Graphics.FromImage(image);
-            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-            painter = new Painter(g, Color.Red);
-            velocity = 5;
+            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias; // Смягчение изображения
+            painter = new Painter(g, selectedColor);
         }
 
-        public void setMode(int mode)
+        public void setMode(int mode) // Выбрать объект для создания
         {
             creationMode = mode;
         }
 
-        public void setColor(Color color)
+        public void setColor(Color color) // Устанавливает цвет новых объектов и изменяет цвет выделенных
         {
             this.color = color;
-            if(selectedStorage.getSize()!=0)
-            {
-                selectedStorage.setFirst();
-                for (int i = 0; i < selectedStorage.getSize(); i++, selectedStorage.next())
-                    selectedStorage.getCurrent().color = color;
-            }
+            for (selectedStorage.setFirst(); !selectedStorage.eol(); selectedStorage.next())
+                selectedStorage.getCurrent().color = color;
         }
 
-        public GraphicObject temp;
-
-        public void doTheRightThing(int x, int y)
+        public void redrawAll() // Перерисовка изображения
         {
-            if(check(x,y)) // Если попали по элементу, выбор
+            g.Clear(Color.White);
+            storage.setFirst();
+            for (int i = 0; i < storage.getSize(); i++, storage.next())
+                painter.drawObject(storage.getCurrent());
+            refresh();
+        }
+
+        private void deselectAll() // Снимаем выделение всех объектов
+        {
+            for (selectedStorage.setFirst(); !selectedStorage.eol(); selectedStorage.next())
+                selectedStorage.getCurrent().isSelected = false;
+            selectedStorage = new Storage<GraphicObject>();
+        }
+
+        public void doTheRightThing(int x, int y) // В зависимости от исходных данных выполняет необходимые действия
+        {
+            if(checkAndSelect(x,y)) // Если попали по элементу, выбор
             {
                 redrawAll();
             }
@@ -90,68 +100,63 @@ namespace Лабораторная_работа__6
             painter.drawObject(temp);
         }
 
-        public void redrawAll()
-        {
-            g.Clear(Color.White);
-            storage.setFirst();
-            for (int i = 0; i < storage.getSize(); i++, storage.next())
-                painter.drawObject(storage.getCurrent());
-        }
-
-        private bool check(int x,int y)
+        // Функция ищет объекты, которым принадлежит заданная точка.
+        // Если ctrl не зажат, хранилище выбранных очищается.
+        // Если точка принадлежит объекту,
+        // Объект добавляется в хранилище выбранных.
+        // Функция вернёт true, если точка принадлежит объекту,
+        // И false, если кликнули на пустое место.
+        private bool checkAndSelect(int x,int y) 
         {
             bool found = false;
-            storage.setFirst();
-            for (int i = 0; i < storage.getSize(); i++, storage.next())
+            for (storage.setFirst(); !storage.eol(); storage.next())
                 if (storage.getCurrent().belongsTo(x, y))
                 {
                     temp = storage.getCurrent();
-
-                    if (ctrlIsPressed)
+                    if (ctrlIsPressed) // Если зажат ctrl
                     {
-                        if (temp.isSelected)
+                        if (temp.isSelected) // А объект уже выделен
                         {
-                            temp.isSelected = false;
+                            temp.isSelected = false; // Выделение снимается
                             selectedStorage.checkAndSetCurrent(temp);
                             selectedStorage.del();
                         }
                         else
                         {
-                            temp.isSelected = true;
+                            temp.isSelected = true; // Иначе объект выделяется
                             selectedStorage.add(temp);
                         }
                     }
                     else
                     {
-                        deselectAll();
-                        if (temp.isSelected == false)
+                        bool state = temp.isSelected; // Запоминаем состояние объекта
+                        int n = selectedStorage.getSize(); // Запоминаем количество выделенных объектов
+                        deselectAll(); // Снимаем выделение всех объектов
+                        if (state == false || n > 1) // Объект выделяется, если до этого он не был выделен или был в группе
                         {
-                            selectedStorage.add(storage.getCurrent());
                             temp.isSelected = true;
+                            selectedStorage.add(storage.getCurrent());
                         }
                     }
-
                     found = true;
                 }
             return found;
         }
 
-        private void deselectAll() // Убираем все элементы из списка выбранных
+        public void add() // Добавление объекта в хранилище
         {
-            selectedStorage.setFirst();
-            for (int i = 0; i < selectedStorage.getSize(); i++, selectedStorage.next())
-                selectedStorage.getCurrent().isSelected = false;
-            selectedStorage = new Storage<GraphicObject>();
-        }
-
-        public void add()
-        {
-            if (Math.Abs(temp.width) < 10 && Math.Abs(temp.height) < 10)
+            if (Math.Abs(temp.width) < 10 && Math.Abs(temp.height) < 10) // Если объект очень мал, не создаём его
             {
                 redrawAll();
                 return; 
             }
-            if (temp.className() != "Line")
+            correctTemp();
+            storage.add(temp);
+        }
+
+        public void correctTemp() // Для объектов Rectangle и Ellipse нужна корректировка
+        {
+            if (temp.className() != "Line") 
                 if (temp.width < 0 || temp.height < 0)
                 {
                     temp.x = Math.Min(temp.x, temp.x + temp.width);
@@ -159,32 +164,30 @@ namespace Лабораторная_работа__6
                     temp.width = Math.Abs(temp.width);
                     temp.height = Math.Abs(temp.height);
                 }
-            storage.add(temp);
         }
-        public void correct()
+
+        public void correctSelected() // Корректировка всех выделенных объектов
         {
-            selectedStorage.setFirst();
-            for (int i = 0; i < selectedStorage.getSize(); i++, selectedStorage.next())
+            for (selectedStorage.setFirst(); !selectedStorage.eol(); selectedStorage.next())
             {
                 temp = selectedStorage.getCurrent();
-                if (temp.className() != "Line")
-                    if (temp.width < 0 || temp.height < 0)
-                    {
-                        temp.x = Math.Min(temp.x, temp.x + temp.width);
-                        temp.y = Math.Min(temp.y, temp.y + temp.height);
-                        temp.width = Math.Abs(temp.width);
-                        temp.height = Math.Abs(temp.height);
-                    }
+                correctTemp();
             }
-
         }
-        public void move()
+
+        public void delete() // Удаление выделенных объектов
         {
-            if (altIsPressed)
-            { 
-                changeSize();
-                return ;
-            }
+            for (storage.setFirst(); !storage.eol();)
+                if (storage.getCurrent().isSelected)
+                    storage.del();
+                else
+                    storage.next();
+            selectedStorage = new Storage<GraphicObject>();
+            redrawAll();
+        }
+
+        public void move() // Двигает выделенные объекты
+        {
             if (selectedStorage.getSize() == 0)
                 return ;
             int x = 0;
@@ -204,15 +207,25 @@ namespace Лабораторная_работа__6
             for (int i = 0; i < selectedStorage.getSize(); i++, selectedStorage.next())
             {
                 temp = selectedStorage.getCurrent();
-                if (temp.x + x >= 0 && temp.x + temp.width + x >= 0)
-                    temp.x += x;
-                if (temp.y + y >= 0 && temp.y + temp.height + y >= 0)
-                    temp.y += y;
+                if (x != 0)
+                {
+                    if (temp.x + x >= 0 && temp.x + temp.width + x >= 0)
+                        temp.x += x;
+                    else
+                        velocity = 5;
+                }
+                if (y != 0)
+                {
+                    if (temp.y + y >= 0 && temp.y + temp.height + y >= 0)
+                        temp.y += y;
+                    else 
+                        velocity = 5;
+                }
             }
             redrawAll();
         }
 
-        public void changeSize()
+        public void changeSize() // Изменяет размер выделенных объектов
         {
             if (selectedStorage.getSize() == 0)
                 return;
@@ -224,14 +237,10 @@ namespace Лабораторная_работа__6
                 temp = selectedStorage.getCurrent();
                 if (wIsPressed)
                     if (temp.y - currentVelocity >= 0 && temp.y + temp.height - currentVelocity >= 0)
-                    { 
                         temp.height -= currentVelocity;
-                    }
                 if (aIsPressed)
                     if (temp.x - currentVelocity >= 0 && temp.x + temp.width - currentVelocity >= 0)
-                    { 
                         temp.width -= currentVelocity;
-                    }
                 if (sIsPressed)
                     if (temp.y + currentVelocity >= 0 && temp.y + temp.height + currentVelocity >= 0)
                         temp.height += currentVelocity;
@@ -239,21 +248,6 @@ namespace Лабораторная_работа__6
                     if (temp.x + currentVelocity >= 0 && temp.x + temp.width + currentVelocity >= 0)
                         temp.width += currentVelocity;
             }
-            redrawAll();
-        }
-
-        public void delete()
-        {
-            storage.setFirst();
-            for (int i = 0; i < storage.getSize(); i++)
-                if (storage.getCurrent().isSelected)
-                {
-                    storage.del();
-                    i--;
-                }
-                else
-                    storage.next();
-            selectedStorage = new Storage<GraphicObject>();
             redrawAll();
         }
     }

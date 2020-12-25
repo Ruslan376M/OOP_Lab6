@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Лабораторная_работа__6
+﻿namespace Лабораторная_работа__6
 {
 	public class Storage<T>
 	{
@@ -83,11 +77,10 @@ namespace Лабораторная_работа__6
 					current = current.previous;
 		}
 
-		public void next() // Переносит current на следующий элемент в списке, если следующий элемент существует
+		public void next() // Переносит current на следующий элемент в списке
 		{
 			if (current != null)
-				if (current.next != null)
-					current = current.next;
+				current = current.next;
 		}
 
 		public bool check(T obj) // Проверяет наличие объекта хранилище, не изменяя current
@@ -99,7 +92,7 @@ namespace Лабораторная_работа__6
 			return false;
 		}
 
-		public bool checkAndSetCurrent(T obj) // Проверяет наличие объекта хранилище и устанавливает current на этот объект
+		public bool checkAndSetCurrent(T obj) // Проверяет наличие объекта в хранилище и устанавливает current на этот объект
 		{
 			Node buffer = first;
 			for (int i = 0; i < size; i++, buffer = buffer.next)
@@ -141,14 +134,11 @@ namespace Лабораторная_работа__6
 			current = last;
 		}
 
-		public bool eol() // End Of List
+		public bool eol() // Если current = null, return true
 		{
 			if (current == null)
 				return true;
-			if (current.next == null)
-				return true;
-			else
-				return false;
+			return false;
 		}
 	}
 }

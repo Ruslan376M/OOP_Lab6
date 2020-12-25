@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Drawing;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Лабораторная_работа__6
 {
@@ -31,7 +27,7 @@ namespace Лабораторная_работа__6
         public abstract bool belongsTo(int x, int y);
     }
 
-    public class Line : GraphicObject // В Line width и height становятся x2 и y2
+    public class Line : GraphicObject
     {
         public Line(int x, int y, int width, int height, Color color)
             : base(x, y, width, height, color) { }
@@ -43,7 +39,7 @@ namespace Лабораторная_работа__6
 
         public override bool belongsTo(int x, int y)
         {
-            double tgA = (double)(height) / (width) ;
+            double tgA = (double)(height) / (width);
             int minX = Math.Min(this.x, this.x + width);
             int maxX = Math.Max(this.x, this.x + width);
             int minY = Math.Min(this.y, this.y + height);

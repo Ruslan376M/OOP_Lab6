@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Лабораторная_работа__6
@@ -16,44 +9,11 @@ namespace Лабораторная_работа__6
         public MainForm()
         {
             InitializeComponent();
-            this.DoubleBuffered = true;
+            DoubleBuffered = true;
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint, true);
             SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
             model = new Model();
-        }
-
-        private void pictureBox_MouseDown(object sender, MouseEventArgs e)
-        {
-
-            if (e.Button == MouseButtons.Left)
-            {
-                model.mouseIsPressed = true;
-                model.doTheRightThing(e.X, e.Y);
-                pictureBox.Image = model.image;
-            }
-        }
-
-        private void pictureBox_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-                if (model.creatingObject)
-                {
-                    model.drawOnline(e.X, e.Y);
-                    pictureBox.Image = model.image;
-                }
-
-        }
-
-        private void pictureBox_MouseUp(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-                if (model.creatingObject == true)
-                {
-                    model.mouseIsPressed = false;
-                    model.creatingObject = false;
-                    model.add();
-                    pictureBox.Image = model.image;
-                }
+            model.refresh = refresh;
         }
 
         private void lineButton_Click(object sender, EventArgs e)
@@ -69,6 +29,30 @@ namespace Лабораторная_работа__6
         private void ellipseButton_Click(object sender, EventArgs e)
         {
             model.setMode(2);
+        }
+
+        private void pictureBox_MouseDown(object sender, MouseEventArgs e)
+        {
+
+            if (e.Button == MouseButtons.Left)
+                model.doTheRightThing(e.X, e.Y);
+        }
+
+        private void pictureBox_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+                if (model.creatingObject)
+                    model.drawOnline(e.X, e.Y);
+        }
+
+        private void pictureBox_MouseUp(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+                if (model.creatingObject == true)
+                {
+                    model.creatingObject = false;
+                    model.add();
+                }
         }
 
         private void colorPickerButton_Click(object sender, EventArgs e)
@@ -88,29 +72,31 @@ namespace Лабораторная_работа__6
                     model.ctrlIsPressed = true;
                     break;
                 case Keys.ShiftKey:
-                    model.altIsPressed = true;
+                    model.shiftIsPressed = true;
                     break;
                 case Keys.W:
                     model.wIsPressed = true;
-                    model.move();
                     break;
                 case Keys.A:
                     model.aIsPressed = true;
-                    model.move();
                     break;
                 case Keys.S:
                     model.sIsPressed = true;
-                    model.move();
                     break;
                 case Keys.D:
                     model.dIsPressed = true;
-                    model.move();
                     break;
                 case Keys.Delete:
                     model.delete();
                     break;
+                default:
+                    return ;
             }
-            pictureBox.Image = model.image;
+            if (model.wIsPressed || model.aIsPressed || model.sIsPressed || model.dIsPressed)
+                if (model.shiftIsPressed)
+                    model.changeSize();
+                else
+                    model.move();
         }
 
         private void MainForm_KeyUp(object sender, KeyEventArgs e)
@@ -121,8 +107,8 @@ namespace Лабораторная_работа__6
                     model.ctrlIsPressed = false;
                     break;
                 case Keys.ShiftKey:
-                    model.altIsPressed = false;
-                    model.correct();
+                    model.shiftIsPressed = false;
+                    model.correctSelected();
                     break;
                 case Keys.W:
                     model.wIsPressed = false;
@@ -138,6 +124,11 @@ namespace Лабораторная_работа__6
                     break;
             }
             model.velocity = 5;
+        }
+
+        private void refresh()
+        {
+            pictureBox.Image = model.image;
         }
     }
 }
