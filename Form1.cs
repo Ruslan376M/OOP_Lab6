@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace Лабораторная_работа__6
+namespace Лабораторная_работа__7
 {
     public partial class MainForm : Form
     {

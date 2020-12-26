@@ -1,5 +1,5 @@
 ﻿
-namespace Лабораторная_работа__6
+namespace Лабораторная_работа__7
 {
     partial class MainForm
     {

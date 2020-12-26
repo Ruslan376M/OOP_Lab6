@@ -1,4 +1,4 @@
-﻿namespace Лабораторная_работа__6
+﻿namespace Лабораторная_работа__7
 {
 	public class Storage<T>
 	{
