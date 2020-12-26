@@ -1,20 +1,18 @@
 ﻿using System;
 using System.Drawing;
 
-namespace Лабораторная_работа__7
+namespace Лабораторная_работа__N
 {
     public abstract class GraphicObject
     {
-        public int x { get; protected set; }
-        public int y { get; protected set; }
-        public int width { get; protected set; }
-        public int height { get; protected set; }
-        public bool isSelected { get; protected set; }
+        protected int x;
+        protected int y;
+        protected int width;
+        protected int height;
+        public bool isSelected { get; }
         protected Color color;
         protected Color selectedColor = Color.Red;
         protected int thickness = 5;
-
-        protected GraphicObject() { }
 
         public GraphicObject(int x, int y, int width, int height, Color color)
         {
@@ -31,44 +29,10 @@ namespace Лабораторная_работа__7
 
         public abstract void draw(ref Graphics g);
 
-        public virtual void setColor(Color color)
-        {
-            this.color = color;
-        }
-
         public virtual void move(int x, int y)
         {
             this.x += x;
             this.y += y;
-        }
-
-        public virtual void select()
-        {
-            isSelected = true;
-        }
-
-        public virtual void deselect()
-        {
-            isSelected = false;
-        }
-
-        public virtual void changeSize(int diffWidth, int diffHeight)
-        {
-            width += diffWidth;
-            height += diffHeight;
-        }
-
-        public virtual void correct()
-        {
-            if (className() == "Line")
-                return;
-            if (width < 0 || height < 0)
-            {
-                x = Math.Min(x, x + width);
-                y = Math.Min(y, y + height);
-                width = Math.Abs(width);
-                height = Math.Abs(height);
-            }
         }
     }
 
@@ -197,97 +161,8 @@ namespace Лабораторная_работа__7
         }
     }
 
-    public class Compound : GraphicObject
-    {
-        public Storage<GraphicObject> group;
-
-        public Compound()
-        {
-            group = new Storage<GraphicObject>();
-        }
-
-        public void add(ref GraphicObject obj)
-        {
-            if (group.getSize() != 0)
-            {
-                int x1 = Math.Min(x, obj.x);
-                int y1 = Math.Min(y, obj.y);
-                int x2 = Math.Max(x + width, obj.x + obj.width);
-                int y2 = Math.Max(y + height, obj.y + obj.height);
-                x = x1;
-                y = y1;
-                width = x2 - x1;
-                height = y2 - y1;
-            }
-            else
-            {
-                x = obj.x;
-                y = obj.y;
-                width = obj.width;
-                height = obj.height;
-            }
-            group.add(ref obj);
-        }
-
-        public override string className()
-        {
-            return "Compound";
-        }
-
-        public override bool belongsTo(int x, int y)
-        {
-            for (group.setFirst(); !group.eol(); group.next())
-                if (group.getCurrent().belongsTo(x, y))
-                    return true;
-            return false;
-        }
-
-        public override void draw(ref Graphics g)
-        {
-            for (group.setFirst(); !group.eol(); group.next())
-                group.getCurrent().draw(ref g);
-        }
-
-        public override void setColor(Color color)
-        {
-            for (group.setFirst(); !group.eol(); group.next())
-                group.getCurrent().setColor(color);
-        }
-
-        public override void move(int x, int y)
-        {
-            for (group.setFirst(); !group.eol(); group.next())
-                group.getCurrent().move(x, y);
-            this.x += x;
-            this.y += y;
-        }
-
-        public override void select()
-        {
-            for (group.setFirst(); !group.eol(); group.next())
-                group.getCurrent().select();
-            isSelected = true;
-        }
-
-        public override void deselect()
-        {
-            for (group.setFirst(); !group.eol(); group.next())
-                group.getCurrent().deselect();
-            isSelected = false;
-        }
-
-        public override void changeSize(int diffWidth, int diffHeight)
-        {
-            for (group.setFirst(); !group.eol(); group.next())
-                group.getCurrent().changeSize(diffWidth, diffHeight);
-            width += diffWidth;
-            height += diffHeight;
-        }
-
-        public override void correct()
-        {
-            for (group.setFirst(); !group.eol(); group.next())
-                group.getCurrent().correct();
-        }
-    }
+    //public class Compound : GraphicObject
+    //{
+        
+    //}
 }

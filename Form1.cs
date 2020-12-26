@@ -88,6 +88,7 @@ namespace Лабораторная_работа__7
                     break;
                 case Keys.Delete:
                     model.delete();
+                    GC.Collect();
                     break;
                 default:
                     return ;
@@ -129,6 +130,16 @@ namespace Лабораторная_работа__7
         private void refresh()
         {
             pictureBox.Image = model.image;
+        }
+
+        private void groupButton_Click(object sender, EventArgs e)
+        {
+            model.group();
+        }
+
+        private void ungroupButton_Click(object sender, EventArgs e)
+        {
+            model.ungroup();
         }
     }
 }

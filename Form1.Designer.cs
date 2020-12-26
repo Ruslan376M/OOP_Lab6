@@ -38,6 +38,8 @@ namespace Лабораторная_работа__7
             this.ellipseButton = new System.Windows.Forms.Button();
             this.colorDialog = new System.Windows.Forms.ColorDialog();
             this.pictureBox = new System.Windows.Forms.PictureBox();
+            this.groupButton = new System.Windows.Forms.Button();
+            this.ungroupButton = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.flowLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
@@ -47,6 +49,8 @@ namespace Лабораторная_работа__7
             // 
             this.panel1.BackColor = System.Drawing.Color.White;
             this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel1.Controls.Add(this.ungroupButton);
+            this.panel1.Controls.Add(this.groupButton);
             this.panel1.Controls.Add(this.colorLabel);
             this.panel1.Controls.Add(this.colorPickerButton);
             this.panel1.Controls.Add(this.flowLayoutPanel1);
@@ -143,6 +147,30 @@ namespace Лабораторная_работа__7
             this.pictureBox.MouseMove += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseMove);
             this.pictureBox.MouseUp += new System.Windows.Forms.MouseEventHandler(this.pictureBox_MouseUp);
             // 
+            // groupButton
+            // 
+            this.groupButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.groupButton.ForeColor = System.Drawing.Color.CornflowerBlue;
+            this.groupButton.Location = new System.Drawing.Point(3, 76);
+            this.groupButton.Name = "groupButton";
+            this.groupButton.Size = new System.Drawing.Size(174, 25);
+            this.groupButton.TabIndex = 7;
+            this.groupButton.Text = "Группировка";
+            this.groupButton.UseVisualStyleBackColor = true;
+            this.groupButton.Click += new System.EventHandler(this.groupButton_Click);
+            // 
+            // ungroupButton
+            // 
+            this.ungroupButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.ungroupButton.ForeColor = System.Drawing.Color.CornflowerBlue;
+            this.ungroupButton.Location = new System.Drawing.Point(3, 107);
+            this.ungroupButton.Name = "ungroupButton";
+            this.ungroupButton.Size = new System.Drawing.Size(174, 25);
+            this.ungroupButton.TabIndex = 8;
+            this.ungroupButton.Text = "Разгруппировка";
+            this.ungroupButton.UseVisualStyleBackColor = true;
+            this.ungroupButton.Click += new System.EventHandler(this.ungroupButton_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -175,6 +203,8 @@ namespace Лабораторная_работа__7
         private System.Windows.Forms.Button colorPickerButton;
         private System.Windows.Forms.Label colorLabel;
         private System.Windows.Forms.PictureBox pictureBox;
+        private System.Windows.Forms.Button groupButton;
+        private System.Windows.Forms.Button ungroupButton;
     }
 }
 

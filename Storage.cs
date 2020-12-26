@@ -18,7 +18,7 @@
 			size = 0;
 		}
 
-		public void add(T obj) // Добавляет объект в хранилище в конец списка
+		public void add(ref T obj) // Добавляет объект в хранилище в конец списка
 		{
 			Node temp = new Node();
 			temp.obj = obj;

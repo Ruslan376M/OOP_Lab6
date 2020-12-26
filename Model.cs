@@ -7,7 +7,6 @@ namespace Лабораторная_работа__7
     {
         public Graphics g; // Предоставляет методы для рисования
         public Bitmap image; // Изображение, на котором происходят изменения
-        private Painter painter; // Класс, который знает, как должны выглядеть объекты
         private Color color = Color.Black; // Цвет новых объектов
         private Color selectedColor = Color.Red; // Цвет выделенных объектов
 
@@ -37,7 +36,6 @@ namespace Лабораторная_работа__7
             image = new Bitmap(1920, 1080);
             g = Graphics.FromImage(image);
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias; // Смягчение изображения
-            painter = new Painter(g, selectedColor);
         }
 
         public void setMode(int mode) // Выбрать объект для создания
@@ -49,7 +47,7 @@ namespace Лабораторная_работа__7
         {
             this.color = color;
             for (selectedStorage.setFirst(); !selectedStorage.eol(); selectedStorage.next())
-                selectedStorage.getCurrent().color = color;
+                selectedStorage.getCurrent().setColor(color);
         }
 
         public void redrawAll() // Перерисовка изображения
@@ -57,24 +55,22 @@ namespace Лабораторная_работа__7
             g.Clear(Color.White);
             storage.setFirst();
             for (int i = 0; i < storage.getSize(); i++, storage.next())
-                painter.drawObject(storage.getCurrent());
+                storage.getCurrent().draw(ref g);
             refresh();
         }
 
         private void deselectAll() // Снимаем выделение всех объектов
         {
             for (selectedStorage.setFirst(); !selectedStorage.eol(); selectedStorage.next())
-                selectedStorage.getCurrent().isSelected = false;
+                selectedStorage.getCurrent().deselect();
             selectedStorage = new Storage<GraphicObject>();
         }
 
         public void doTheRightThing(int x, int y) // В зависимости от исходных данных выполняет необходимые действия
         {
-            if(checkAndSelect(x,y)) // Если попали по элементу, выбор
-            {
+            if(checkAndSelect(x,y)) // Если попали по элементу - выделение
                 redrawAll();
-            }
-            else // Если попали по пустому месту, создание
+            else // Если попали по пустому месту - создание
             {
                 deselectAll();
                 creatingObject = true;
@@ -94,10 +90,9 @@ namespace Лабораторная_работа__7
             if (y < 0)
                 y = 0;
             g.Clear(Color.White);
-            temp.width = x - temp.x;
-            temp.height = y - temp.y;
+            temp.changeSize(x - temp.x - temp.width, y - temp.y - temp.height);
             redrawAll();
-            painter.drawObject(temp);
+            temp.draw(ref g);
         }
 
         // Функция ищет объекты, которым принадлежит заданная точка.
@@ -117,14 +112,14 @@ namespace Лабораторная_работа__7
                     {
                         if (temp.isSelected) // А объект уже выделен
                         {
-                            temp.isSelected = false; // Выделение снимается
+                            temp.deselect(); // Выделение снимается
                             selectedStorage.checkAndSetCurrent(temp);
                             selectedStorage.del();
                         }
                         else
                         {
-                            temp.isSelected = true; // Иначе объект выделяется
-                            selectedStorage.add(temp);
+                            temp.select(); // Иначе объект выделяется
+                            selectedStorage.add(ref temp);
                         }
                     }
                     else
@@ -134,8 +129,8 @@ namespace Лабораторная_работа__7
                         deselectAll(); // Снимаем выделение всех объектов
                         if (state == false || n > 1) // Объект выделяется, если до этого он не был выделен или был в группе
                         {
-                            temp.isSelected = true;
-                            selectedStorage.add(storage.getCurrent());
+                            temp.select();
+                            selectedStorage.add(ref storage.getCurrent());
                         }
                     }
                     found = true;
@@ -150,20 +145,8 @@ namespace Лабораторная_работа__7
                 redrawAll();
                 return; 
             }
-            correctTemp();
-            storage.add(temp);
-        }
-
-        public void correctTemp() // Для объектов Rectangle и Ellipse нужна корректировка
-        {
-            if (temp.className() != "Line") 
-                if (temp.width < 0 || temp.height < 0)
-                {
-                    temp.x = Math.Min(temp.x, temp.x + temp.width);
-                    temp.y = Math.Min(temp.y, temp.y + temp.height);
-                    temp.width = Math.Abs(temp.width);
-                    temp.height = Math.Abs(temp.height);
-                }
+            temp.correct();
+            storage.add(ref temp);
         }
 
         public void correctSelected() // Корректировка всех выделенных объектов
@@ -171,7 +154,7 @@ namespace Лабораторная_работа__7
             for (selectedStorage.setFirst(); !selectedStorage.eol(); selectedStorage.next())
             {
                 temp = selectedStorage.getCurrent();
-                correctTemp();
+                temp.correct();
             }
         }
 
@@ -204,23 +187,29 @@ namespace Лабораторная_работа__7
             x *= velocity / 5;
             y *= velocity / 5;
             selectedStorage.setFirst();
-            for (int i = 0; i < selectedStorage.getSize(); i++, selectedStorage.next())
+            for (selectedStorage.setFirst(); !selectedStorage.eol(); selectedStorage.next())
             {
                 temp = selectedStorage.getCurrent();
+                int x1 = x;
+                int y1 = y;
                 if (x != 0)
                 {
-                    if (temp.x + x >= 0 && temp.x + temp.width + x >= 0)
-                        temp.x += x;
-                    else
-                        velocity = 5;
+                    if (temp.x + x < 0 || temp.x + temp.width + x < 0)
+                    {
+                        x1 = 0;
+                        velocity = 5; 
+                    }
                 }
                 if (y != 0)
                 {
-                    if (temp.y + y >= 0 && temp.y + temp.height + y >= 0)
-                        temp.y += y;
-                    else 
+                    if (temp.y + y < 0 || temp.y + temp.height + y < 0)
+                    {
+                        y1 = 0;
                         velocity = 5;
+                    }
                 }
+                if (x1 != 0 || y1 != 0)
+                    temp.move(x1, y1);
             }
             redrawAll();
         }
@@ -231,24 +220,61 @@ namespace Лабораторная_работа__7
                 return;
             velocity++;
             int currentVelocity = velocity / 5;
-            selectedStorage.setFirst();
-            for (int i = 0; i < selectedStorage.getSize(); i++, selectedStorage.next())
+            for (selectedStorage.setFirst(); !selectedStorage.eol(); selectedStorage.next())
             {
                 temp = selectedStorage.getCurrent();
+                int width = 0;
+                int height = 0;
                 if (wIsPressed)
                     if (temp.y - currentVelocity >= 0 && temp.y + temp.height - currentVelocity >= 0)
-                        temp.height -= currentVelocity;
+                        height -= currentVelocity;
                 if (aIsPressed)
                     if (temp.x - currentVelocity >= 0 && temp.x + temp.width - currentVelocity >= 0)
-                        temp.width -= currentVelocity;
+                        width -= currentVelocity;
                 if (sIsPressed)
                     if (temp.y + currentVelocity >= 0 && temp.y + temp.height + currentVelocity >= 0)
-                        temp.height += currentVelocity;
+                        height += currentVelocity;
                 if (dIsPressed)
                     if (temp.x + currentVelocity >= 0 && temp.x + temp.width + currentVelocity >= 0)
-                        temp.width += currentVelocity;
+                        width += currentVelocity;
+                temp.changeSize(width, height);
             }
             redrawAll();
+        }
+
+        public void group()
+        {
+            selectedStorage = new Storage<GraphicObject>();
+            GraphicObject group = new Compound();
+            for (storage.setFirst(); !storage.eol();)
+                if (storage.getCurrent().isSelected)
+                {
+                    ((Compound)group).add(ref storage.getCurrent());
+                    storage.del();
+                }
+                else
+                    storage.next();
+            storage.add(ref group);
+            selectedStorage.add(ref group);
+        }
+
+        public void ungroup()
+        {
+            selectedStorage = new Storage<GraphicObject>();
+            for (storage.setFirst(); !storage.eol();)
+                if (storage.getCurrent().isSelected && storage.getCurrent().className() == "Compound")
+                {
+                    Compound temp = (Compound)storage.getCurrent();
+                    for (temp.group.setFirst(); !temp.group.eol(); temp.group.next())
+                    {
+                        storage.add(ref temp.group.getCurrent());
+                        selectedStorage.add(ref temp.group.getCurrent());
+                    }
+                    storage.del();
+                }
+                else
+                    storage.next();
+
         }
     }
 }
