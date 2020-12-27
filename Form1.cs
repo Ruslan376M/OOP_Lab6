@@ -141,5 +141,20 @@ namespace Лабораторная_работа__7
         {
             model.ungroup();
         }
+
+        private void saveButton_Click(object sender, EventArgs e)
+        {
+            model.save();
+        }
+
+        private void loadButton_Click(object sender, EventArgs e)
+        {
+            model.load();
+        }
+
+        private void clearButton_Click(object sender, EventArgs e)
+        {
+            model.clear();
+        }
     }
 }

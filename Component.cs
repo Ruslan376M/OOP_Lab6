@@ -160,9 +160,4 @@ namespace Лабораторная_работа__N
             g.DrawEllipse(pen, x, y, width, height);
         }
     }
-
-    //public class Compound : GraphicObject
-    //{
-        
-    //}
 }

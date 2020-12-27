@@ -40,6 +40,9 @@ namespace Лабораторная_работа__7
             this.pictureBox = new System.Windows.Forms.PictureBox();
             this.groupButton = new System.Windows.Forms.Button();
             this.ungroupButton = new System.Windows.Forms.Button();
+            this.saveButton = new System.Windows.Forms.Button();
+            this.loadButton = new System.Windows.Forms.Button();
+            this.clearButton = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.flowLayoutPanel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox)).BeginInit();
@@ -49,6 +52,9 @@ namespace Лабораторная_работа__7
             // 
             this.panel1.BackColor = System.Drawing.Color.White;
             this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel1.Controls.Add(this.clearButton);
+            this.panel1.Controls.Add(this.loadButton);
+            this.panel1.Controls.Add(this.saveButton);
             this.panel1.Controls.Add(this.ungroupButton);
             this.panel1.Controls.Add(this.groupButton);
             this.panel1.Controls.Add(this.colorLabel);
@@ -151,7 +157,7 @@ namespace Лабораторная_работа__7
             // 
             this.groupButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.groupButton.ForeColor = System.Drawing.Color.CornflowerBlue;
-            this.groupButton.Location = new System.Drawing.Point(3, 76);
+            this.groupButton.Location = new System.Drawing.Point(3, 111);
             this.groupButton.Name = "groupButton";
             this.groupButton.Size = new System.Drawing.Size(174, 25);
             this.groupButton.TabIndex = 7;
@@ -163,13 +169,49 @@ namespace Лабораторная_работа__7
             // 
             this.ungroupButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.ungroupButton.ForeColor = System.Drawing.Color.CornflowerBlue;
-            this.ungroupButton.Location = new System.Drawing.Point(3, 107);
+            this.ungroupButton.Location = new System.Drawing.Point(3, 142);
             this.ungroupButton.Name = "ungroupButton";
             this.ungroupButton.Size = new System.Drawing.Size(174, 25);
             this.ungroupButton.TabIndex = 8;
             this.ungroupButton.Text = "Разгруппировка";
             this.ungroupButton.UseVisualStyleBackColor = true;
             this.ungroupButton.Click += new System.EventHandler(this.ungroupButton_Click);
+            // 
+            // saveButton
+            // 
+            this.saveButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.saveButton.ForeColor = System.Drawing.Color.CornflowerBlue;
+            this.saveButton.Location = new System.Drawing.Point(3, 173);
+            this.saveButton.Name = "saveButton";
+            this.saveButton.Size = new System.Drawing.Size(174, 25);
+            this.saveButton.TabIndex = 9;
+            this.saveButton.Text = "Сохранить";
+            this.saveButton.UseVisualStyleBackColor = true;
+            this.saveButton.Click += new System.EventHandler(this.saveButton_Click);
+            // 
+            // loadButton
+            // 
+            this.loadButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.loadButton.ForeColor = System.Drawing.Color.CornflowerBlue;
+            this.loadButton.Location = new System.Drawing.Point(3, 204);
+            this.loadButton.Name = "loadButton";
+            this.loadButton.Size = new System.Drawing.Size(174, 25);
+            this.loadButton.TabIndex = 10;
+            this.loadButton.Text = "Загрузить";
+            this.loadButton.UseVisualStyleBackColor = true;
+            this.loadButton.Click += new System.EventHandler(this.loadButton_Click);
+            // 
+            // clearButton
+            // 
+            this.clearButton.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.clearButton.ForeColor = System.Drawing.Color.CornflowerBlue;
+            this.clearButton.Location = new System.Drawing.Point(3, 80);
+            this.clearButton.Name = "clearButton";
+            this.clearButton.Size = new System.Drawing.Size(174, 25);
+            this.clearButton.TabIndex = 11;
+            this.clearButton.Text = "Очистить";
+            this.clearButton.UseVisualStyleBackColor = true;
+            this.clearButton.Click += new System.EventHandler(this.clearButton_Click);
             // 
             // MainForm
             // 
@@ -205,6 +247,9 @@ namespace Лабораторная_работа__7
         private System.Windows.Forms.PictureBox pictureBox;
         private System.Windows.Forms.Button groupButton;
         private System.Windows.Forms.Button ungroupButton;
+        private System.Windows.Forms.Button loadButton;
+        private System.Windows.Forms.Button saveButton;
+        private System.Windows.Forms.Button clearButton;
     }
 }
 

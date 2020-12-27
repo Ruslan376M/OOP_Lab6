@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.IO;
 
 namespace Лабораторная_работа__7
 {
@@ -70,10 +71,35 @@ namespace Лабораторная_работа__7
                 height = Math.Abs(height);
             }
         }
+
+        public virtual string save()
+        {
+            string text = "";
+            text += className() + '\n';
+            text += x.ToString() + '\n';
+            text += y.ToString() + '\n';
+            text += width.ToString() + '\n';
+            text += height.ToString() + '\n';
+            text += false.ToString() + '\n';
+            text += color.ToArgb().ToString() + '\n';
+            return text;
+        }
+
+        public virtual void load(ref StreamReader reader)
+        {
+            x = int.Parse(reader.ReadLine());
+            y = int.Parse(reader.ReadLine());
+            width = int.Parse(reader.ReadLine());
+            height = int.Parse(reader.ReadLine());
+            isSelected = bool.Parse(reader.ReadLine());
+            int t = int.Parse(reader.ReadLine());
+            color = Color.FromArgb(t);
+        }
     }
 
     public class Line : GraphicObject
     {
+        public Line() { }
         public Line(int x, int y, int width, int height, Color color)
             : base(x, y, width, height, color) { }
 
@@ -111,6 +137,7 @@ namespace Лабораторная_работа__7
 
     public class Rectangle : GraphicObject
     {
+        public Rectangle() { }
         public Rectangle(int x, int y, int width, int height, Color color)
             : base(x, y, width, height, color) { }
 
@@ -163,6 +190,7 @@ namespace Лабораторная_работа__7
 
     public class Ellipse : GraphicObject
     {
+        public Ellipse() { }
         public Ellipse(int x, int y, int width, int height, Color color)
             : base(x, y, width, height, color) { }
 
@@ -288,6 +316,38 @@ namespace Лабораторная_работа__7
         {
             for (group.setFirst(); !group.eol(); group.next())
                 group.getCurrent().correct();
+        }
+
+        public override string save()
+        {
+            string text = "";
+            text += className() + '\n';
+            text += group.getSize().ToString() + '\n';
+            text += x.ToString() + '\n';
+            text += y.ToString() + '\n';
+            text += width.ToString() + '\n';
+            text += height.ToString() + '\n';
+            text += false.ToString() + '\n';
+            text += color.ToArgb().ToString() + '\n';
+            for (group.setFirst(); !group.eol(); group.next())
+                text += group.getCurrent().save();
+            return text;
+        }
+
+        public override void load(ref StreamReader reader)
+        {
+            int n = int.Parse(reader.ReadLine());
+            x = int.Parse(reader.ReadLine());
+            y = int.Parse(reader.ReadLine());
+            width = int.Parse(reader.ReadLine());
+            height = int.Parse(reader.ReadLine());
+            isSelected = bool.Parse(reader.ReadLine());
+            color = Color.FromArgb(int.Parse(reader.ReadLine()));
+            for (int i = 0; i < n; i++)
+            {
+                GraphicObject obj = Factory.createObject(ref reader);
+                group.add(ref obj);
+            }
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.IO;
 
 namespace Лабораторная_работа__7
 {
@@ -8,7 +9,6 @@ namespace Лабораторная_работа__7
         public Graphics g; // Предоставляет методы для рисования
         public Bitmap image; // Изображение, на котором происходят изменения
         private Color color = Color.Black; // Цвет новых объектов
-        private Color selectedColor = Color.Red; // Цвет выделенных объектов
 
         private Storage<GraphicObject> storage; // Хранилище всех объектов
         private Storage<GraphicObject> selectedStorage; // Хранилище выделенных объектов
@@ -274,7 +274,38 @@ namespace Лабораторная_работа__7
                 }
                 else
                     storage.next();
+        }
 
+        public void save()
+        {
+            StreamWriter writer = new StreamWriter("saveFile", false);
+            writer.WriteLine(storage.getSize());
+            for (storage.setFirst(); !storage.eol(); storage.next())
+                writer.Write(storage.getCurrent().save());
+            writer.Close();
+        }
+
+        public void load()
+        {
+            clear();
+            StreamReader reader = new StreamReader("saveFile");
+            int n = int.Parse(reader.ReadLine());
+            for (int i = 0; i < n; i++)
+            {
+                temp = Factory.createObject(ref reader);
+                storage.add(ref temp); 
+            }
+            reader.Close();
+            redrawAll();
+        }
+
+        public void clear()
+        {
+            temp = null;
+            storage = new Storage<GraphicObject>();
+            selectedStorage = new Storage<GraphicObject>();
+            GC.Collect();
+            redrawAll();
         }
     }
 }
