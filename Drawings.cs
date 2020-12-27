@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Drawing;
 using System.IO;
+using System.Windows.Forms;
 
-namespace Лабораторная_работа__7
+namespace Лабораторная_работа__8
 {
     public abstract class GraphicObject
     {
+        public TreeNodeDesc treeNodeDesc;
+        public Storage<GraphicObject> subscribers = new Storage<GraphicObject>();
         public int x { get; protected set; }
         public int y { get; protected set; }
         public int width { get; protected set; }
@@ -14,6 +17,8 @@ namespace Лабораторная_работа__7
         protected Color color;
         protected Color selectedColor = Color.Red;
         protected int thickness = 5;
+        public bool isSticky;
+        public bool isSticked;
 
         protected GraphicObject() { }
 
@@ -39,8 +44,14 @@ namespace Лабораторная_работа__7
 
         public virtual void move(int x, int y)
         {
+            if (isSticky)
+            {
+                for (subscribers.setFirst(); !subscribers.eol(); subscribers.next())
+                    subscribers.getCurrent().move(x, y);
+            }
             this.x += x;
             this.y += y;
+            
         }
 
         public virtual void select()

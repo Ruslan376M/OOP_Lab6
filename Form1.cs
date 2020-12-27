@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace Лабораторная_работа__7
+namespace Лабораторная_работа__8
 {
     public partial class MainForm : Form
     {
@@ -13,6 +13,9 @@ namespace Лабораторная_работа__7
             SetStyle(ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint, true);
             SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
             model = new Model();
+            model.treeView = treeView;
+            model.treeView.AfterSelect += model.TreeView_AfterSelect;
+            treeView.Focus();
             model.refresh = refresh;
         }
 
@@ -155,6 +158,11 @@ namespace Лабораторная_работа__7
         private void clearButton_Click(object sender, EventArgs e)
         {
             model.clear();
+        }
+
+        private void stickyObjectButton_Click(object sender, EventArgs e)
+        {
+            model.makeStickyObject();
         }
     }
 }

@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Drawing;
 using System.IO;
+using System.Windows.Forms;
 
-namespace Лабораторная_работа__7
+namespace Лабораторная_работа__8
 {
     public class Model
     {
@@ -27,6 +28,7 @@ namespace Лабораторная_работа__7
         
         public delegate void Refresh();
         public Refresh refresh; // Функция обновления картинки в интерфейсе
+        public TreeView treeView;
 
         public Model()
         {
@@ -119,6 +121,7 @@ namespace Лабораторная_работа__7
                         else
                         {
                             temp.select(); // Иначе объект выделяется
+                            treeView.SelectedNode = temp.treeNodeDesc;
                             selectedStorage.add(ref temp);
                         }
                     }
@@ -130,6 +133,7 @@ namespace Лабораторная_работа__7
                         if (state == false || n > 1) // Объект выделяется, если до этого он не был выделен или был в группе
                         {
                             temp.select();
+                            treeView.SelectedNode = temp.treeNodeDesc;
                             selectedStorage.add(ref storage.getCurrent());
                         }
                     }
@@ -147,6 +151,7 @@ namespace Лабораторная_работа__7
             }
             temp.correct();
             storage.add(ref temp);
+            rebuildTree();
         }
 
         public void correctSelected() // Корректировка всех выделенных объектов
@@ -166,6 +171,7 @@ namespace Лабораторная_работа__7
                 else
                     storage.next();
             selectedStorage = new Storage<GraphicObject>();
+            rebuildTree();
             redrawAll();
         }
 
@@ -209,9 +215,42 @@ namespace Лабораторная_работа__7
                     }
                 }
                 if (x1 != 0 || y1 != 0)
+                { 
                     temp.move(x1, y1);
+                    checkForStickness(temp);
+
+                }
             }
             redrawAll();
+        }
+
+        public void checkForStickness(GraphicObject obj)
+        {
+            if (obj.isSticky)
+                for (storage.setFirst(); !storage.eol(); storage.next())
+                {
+                    GraphicObject temp = storage.getCurrent();
+                    if (temp.isSticked == false && temp.isSticky == false && temp.isSelected == false)
+                    {
+                        if (temp.className() == "Line")
+                        {
+                            if (obj.belongsTo(temp.x, temp.y) || obj.belongsTo(temp.x + temp.width, temp.y + temp.height))
+                            { 
+                                obj.subscribers.add(ref temp);
+                                temp.isSticked = true;
+                            }
+                        }
+                        else if (obj.belongsTo(temp.x + temp.width / 2, temp.y) ||
+                                obj.belongsTo(temp.x, temp.y + temp.height / 2) ||
+                                obj.belongsTo(temp.x + temp.width, temp.y + temp.height / 2) ||
+                                obj.belongsTo(temp.x + temp.width / 2, temp.y + temp.height))
+                        {
+                            obj.subscribers.add(ref temp);
+                            temp.isSticked = true;
+                        }
+
+                    }
+                }
         }
 
         public void changeSize() // Изменяет размер выделенных объектов
@@ -256,6 +295,7 @@ namespace Лабораторная_работа__7
                     storage.next();
             storage.add(ref group);
             selectedStorage.add(ref group);
+            rebuildTree();
         }
 
         public void ungroup()
@@ -274,6 +314,7 @@ namespace Лабораторная_работа__7
                 }
                 else
                     storage.next();
+            rebuildTree();
         }
 
         public void save()
@@ -296,6 +337,7 @@ namespace Лабораторная_работа__7
                 storage.add(ref temp); 
             }
             reader.Close();
+            rebuildTree();
             redrawAll();
         }
 
@@ -304,8 +346,55 @@ namespace Лабораторная_работа__7
             temp = null;
             storage = new Storage<GraphicObject>();
             selectedStorage = new Storage<GraphicObject>();
+            rebuildTree();
             GC.Collect();
             redrawAll();
+        }
+
+        public void rebuildTree()
+        {
+            treeView.Nodes.Clear();
+            TreeNodeDesc t = new TreeNodeDesc("Объекты");
+            treeView.Nodes.Add(t);
+            for (storage.setFirst(); !storage.eol(); storage.next())
+                processNode(t, storage.getCurrent());
+            treeView.ExpandAll();
+        }
+
+        private void processNode(TreeNode tn, GraphicObject obj)
+        {
+            string name = obj.className();
+            TreeNodeDesc t = new TreeNodeDesc(name);
+            t.obj = obj;
+            obj.treeNodeDesc = t;
+            tn.Nodes.Add(t);
+            if (name == "Compound")
+            {
+                Storage<GraphicObject> temp = ((Compound)obj).group;
+                for (temp.setFirst(); !temp.eol(); temp.next())
+                    processNode(t, temp.getCurrent());
+            }
+        }
+
+        public void TreeView_AfterSelect(object sender, TreeViewEventArgs e)
+        {
+            if (e.Action != TreeViewAction.Unknown)
+            {
+                deselectAll();
+                GraphicObject obj = ((TreeNodeDesc)treeView.SelectedNode).obj;
+                if (obj != null)
+                {
+                    obj.select();
+                    selectedStorage.add(ref obj);
+                    redrawAll();
+                }
+            }
+        }
+
+        public void makeStickyObject()
+        {
+            for (selectedStorage.setFirst(); !selectedStorage.eol(); selectedStorage.next())
+                selectedStorage.getCurrent().isSticky = !selectedStorage.getCurrent().isSticky;
         }
     }
 }

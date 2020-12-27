@@ -1,4 +1,6 @@
-﻿namespace Лабораторная_работа__7
+﻿using System.Windows.Forms;
+
+namespace Лабораторная_работа__8
 {
 	public class Storage<T>
 	{

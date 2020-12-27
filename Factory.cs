@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace Лабораторная_работа__7
+namespace Лабораторная_работа__8
 {
     public static class Factory
     {
