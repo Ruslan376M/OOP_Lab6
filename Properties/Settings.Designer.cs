@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Лабораторная_работа__7.Properties {
+namespace Лабораторная_работа__8.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
